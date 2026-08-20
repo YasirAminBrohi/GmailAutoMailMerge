@@ -1,0 +1,403 @@
+/* Gmail AutoMail Merge - Premium Stylesheet */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+:root {
+  --bg-primary: rgba(18, 20, 26, 0.95);
+  --bg-secondary: rgba(28, 31, 40, 0.8);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --primary-gradient: linear-gradient(135deg, #7c3aed, #2563eb);
+  --primary-hover-gradient: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --font-family: 'Outfit', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating Launcher Button */
+.amm-launcher-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+  cursor: pointer;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.amm-launcher-btn:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.6);
+  background: var(--primary-hover-gradient);
+}
+
+.amm-launcher-btn svg {
+  width: 26px;
+  height: 26px;
+  fill: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+/* Pulse animation for the launcher when active or ready */
+@keyframes amm-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(124, 58, 237, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  }
+}
+
+.amm-launcher-btn.pulse {
+  animation: amm-pulse 2s infinite;
+}
+
+/* Main Control Panel */
+.amm-panel {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  width: 380px;
+  height: 600px;
+  background: var(--bg-primary);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 999998;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.amm-panel.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* Panel Header */
+.amm-header {
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+}
+
+.amm-header-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: linear-gradient(120deg, #c084fc, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.amm-header-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.amm-header-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* Scrollable Content */
+.amm-body {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Form Groups */
+.amm-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.amm-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* CSV Drag & Drop Area */
+.amm-file-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.amm-file-dropzone:hover, .amm-file-dropzone.dragover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.amm-file-dropzone svg {
+  width: 32px;
+  height: 32px;
+  fill: var(--text-secondary);
+  transition: fill 0.2s ease;
+}
+
+.amm-file-dropzone:hover svg {
+  fill: #818cf8;
+}
+
+.amm-file-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.amm-file-info {
+  font-size: 13px;
+  color: var(--success-color);
+  font-weight: 500;
+  display: none;
+}
+
+/* Text Inputs and Textarea */
+.amm-input, .amm-textarea {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.amm-input:focus, .amm-textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  background: rgba(28, 31, 40, 0.95);
+}
+
+.amm-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Variables Badge Guide */
+.amm-vars-guide {
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.amm-var-badge {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-right: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* Action Controls Panel */
+.amm-footer {
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.amm-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.amm-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.amm-btn-primary {
+  background: var(--primary-gradient);
+  color: #ffffff;
+}
+
+.amm-btn-primary:hover {
+  background: var(--primary-hover-gradient);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.amm-btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.amm-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.amm-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.amm-btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.amm-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+/* Progress Section */
+.amm-progress-section {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.amm-progress-text {
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+}
+
+.amm-progress-bar-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.amm-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--primary-gradient);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Console Logs Log */
+.amm-console {
+  display: none;
+  background: #0d0e12;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  height: 120px;
+  overflow-y: auto;
+  color: var(--text-secondary);
+  flex-direction: column;
+  gap: 4px;
+}
+
+.amm-console-log {
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.amm-console-log.success { color: var(--success-color); }
+.amm-console-log.info { color: #60a5fa; }
+.amm-console-log.warn { color: var(--warning-color); }
+.amm-console-log.error { color: var(--danger-color); }
+
+/* Custom Scrollbar for Sleek Aesthetics */
+.amm-body::-webkit-scrollbar, .amm-console::-webkit-scrollbar {
+  width: 6px;
+}
+
+.amm-body::-webkit-scrollbar-track, .amm-console::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.amm-body::-webkit-scrollbar-thumb, .amm-console::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.amm-body::-webkit-scrollbar-thumb:hover, .amm-console::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Placeholder support for contenteditable */
+.amm-textarea[contenteditable="true"]:empty:before {
+  content: attr(placeholder);
+  color: var(--text-secondary);
+  opacity: 0.6;
+  pointer-events: none;
+}
