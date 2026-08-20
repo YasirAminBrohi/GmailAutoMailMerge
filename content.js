@@ -18,22 +18,21 @@ const sleep = (ms) => new Promise((resolve) => {
   setTimeout(resolve, duration);
 });
 
-// Safe native property setter for React/Closure/Vanilla inputs
-function setNativeValue(element, value) {
-  if (!element) return;
+// Close all open compose dialogs to keep UI clean and prevent multiple windows opening
+function closeAllComposeDialogs() {
   try {
-    const prototype = Object.getPrototypeOf(element);
-    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
-    if (prototypeValueSetter) {
-      prototypeValueSetter.call(element, value);
-    } else {
-      element.value = value;
+    const dialogs = document.querySelectorAll('div[role="dialog"]');
+    for (const d of dialogs) {
+      if (d.querySelector('input[name="subjectbox"]') || d.querySelector('[aria-label="Message Body"]')) {
+        const closeBtn = d.querySelector('[aria-label^="Save & close"], [aria-label^="Close"], .Ha, img.Ha');
+        if (closeBtn) {
+          closeBtn.click();
+        }
+      }
     }
   } catch (e) {
-    element.value = value;
+    console.error("Error closing compose dialogs:", e);
   }
-  element.dispatchEvent(new Event('input', { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 // Dedicated robust recipient field filler
@@ -44,10 +43,23 @@ async function fillRecipientField(composeDialog, email) {
   }
   
   toInput.focus();
-  await sleep(150);
+  await sleep(300); // Allow Gmail dialog autofocus to settle completely
   
-  // Set full email accurately (prevents dropping initial characters)
-  setNativeValue(toInput, email);
+  toInput.value = '';
+  toInput.dispatchEvent(new Event('input', { bubbles: true }));
+  
+  // Use execCommand to insert the entire email address at once
+  let inserted = false;
+  try {
+    inserted = document.execCommand('insertText', false, email);
+  } catch (e) {}
+  
+  // Fallback direct assignment if execCommand was ignored
+  if (!inserted || toInput.value !== email) {
+    toInput.value = email;
+    toInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  
   await sleep(150);
   
   // Dispatch Enter key (code 13) to convert to recipient chip
@@ -79,10 +91,23 @@ async function fillSubjectField(composeDialog, subject) {
   }
   
   subjectInput.focus();
-  await sleep(100);
+  await sleep(200);
   
-  setNativeValue(subjectInput, subject);
-  await sleep(100);
+  subjectInput.value = '';
+  subjectInput.dispatchEvent(new Event('input', { bubbles: true }));
+  
+  let inserted = false;
+  try {
+    inserted = document.execCommand('insertText', false, subject);
+  } catch (e) {}
+  
+  if (!inserted || subjectInput.value !== subject) {
+    subjectInput.value = subject;
+    subjectInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  
+  subjectInput.dispatchEvent(new Event('change', { bubbles: true }));
+  await sleep(150);
 }
 
 // Dedicated robust body field filler
@@ -805,6 +830,10 @@ class MailMergeController {
   
   // High-fidelity UI automation logic
   async sendEmailDOM(email, subject, body) {
+    // 0. Close any stale compose dialogs to prevent multiple windows opening
+    closeAllComposeDialogs();
+    await sleep(300);
+    
     // 1. Click Compose button
     const composeBtn = findComposeButton();
     if (!composeBtn) {
