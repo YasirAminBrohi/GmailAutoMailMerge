@@ -281,6 +281,49 @@ const SELECTORS = {
   ]
 };
 
+async function attachFilesToCompose(composeDialog, files) {
+  if (!files || files.length === 0) {
+    return;
+  }
+
+  let fileInput = resolveElement([
+    'input[type="file"]',
+    'input[name="Filedata"]',
+    'input[accept]',
+  ], composeDialog) || document.querySelector('input[type="file"]');
+
+  if (!fileInput) {
+    const attachButton = await waitForElement(() => resolveElement([
+      'div[role="button"][aria-label="Attach files"]',
+      'div[role="button"][aria-label^="Attach"]',
+      '[aria-label="Attach files"]',
+      '[aria-label^="Attach"]'
+    ], composeDialog), 4000);
+    await simulateHumanClick(attachButton);
+    await sleep(500);
+
+    fileInput = await waitForElement(() => resolveElement([
+      'input[type="file"]',
+      'input[name="Filedata"]',
+      'input[accept]'
+    ], composeDialog) || document.querySelector('input[type="file"]'), 4000);
+  }
+
+  if (!fileInput) {
+    throw new Error('Could not find the Gmail attachment input. Please confirm the compose window is active.');
+  }
+
+  try {
+    const dataTransfer = new DataTransfer();
+    files.forEach(file => dataTransfer.items.add(file));
+    fileInput.files = dataTransfer.files;
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    await sleep(600 + Math.random() * 400);
+  } catch (error) {
+    throw new Error(`Failed to attach files to Gmail compose: ${error.message}`);
+  }
+}
+
 // Generic element resolver trying multiple selectors
 function resolveElement(selectors, parent = document) {
   for (const selector of selectors) {
@@ -350,6 +393,7 @@ class MailMergeController {
     this.state = 'idle'; // 'idle', 'sending', 'paused'
     this.currentIndex = 0;
     this.emailColumn = '';
+    this.attachmentFiles = [];
     this.dragged = false;
     
     this.initUI();
@@ -403,6 +447,16 @@ class MailMergeController {
         <div class="amm-group">
           <label class="amm-label">3. Message Body (Rich Text / HTML supported)</label>
           <div contenteditable="true" class="amm-textarea" id="ammBody" placeholder="Hi {name},&#10;&#10;We wanted to let you know that your email {email} is ready.&#10;&#10;Best regards,&#10;Support Team" style="min-height: 140px; max-height: 200px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="amm-group">
+          <label class="amm-label">4. Optional attachments for every email</label>
+          <div class="amm-attachment-box">
+            <input type="file" id="ammAttachmentInput" multiple style="display: none;">
+            <button type="button" class="amm-btn amm-btn-secondary amm-attachment-picker" id="ammAttachmentPicker">Choose files</button>
+            <button type="button" class="amm-btn amm-btn-danger amm-attachment-clear" id="ammAttachmentClear" style="display: none;">Clear</button>
+          </div>
+          <div class="amm-attachment-list" id="ammAttachmentList">No files selected</div>
         </div>
         
         <div class="amm-group">
@@ -464,6 +518,9 @@ class MailMergeController {
     const actionBtn = document.getElementById('ammActionBtn');
     const cancelBtn = document.getElementById('ammCancelBtn');
     const header = document.getElementById('ammHeader');
+    const attachmentInput = document.getElementById('ammAttachmentInput');
+    const attachmentPicker = document.getElementById('ammAttachmentPicker');
+    const attachmentClear = document.getElementById('ammAttachmentClear');
     
     // Toggle Panel
     launcher.addEventListener('click', () => {
@@ -540,6 +597,19 @@ class MailMergeController {
         this.handleCSVFile(e.target.files[0]);
       }
     });
+
+    attachmentPicker.addEventListener('click', () => attachmentInput.click());
+    attachmentInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        this.handleAttachmentFiles(e.target.files);
+      }
+    });
+    attachmentClear.addEventListener('click', () => {
+      this.attachmentFiles = [];
+      attachmentInput.value = '';
+      this.renderAttachmentList();
+      this.log('Attachment selection cleared.', 'warn');
+    });
     
     // Start / Pause / Resume
     actionBtn.addEventListener('click', () => {
@@ -600,6 +670,37 @@ class MailMergeController {
     };
     reader.readAsText(file);
   }
+
+  handleAttachmentFiles(files) {
+    const nextFiles = Array.from(files || []).filter(Boolean);
+    if (nextFiles.length === 0) {
+      this.log('No valid files were selected for attachment.', 'warn');
+      return;
+    }
+
+    this.attachmentFiles = nextFiles;
+    this.renderAttachmentList();
+    this.log(`Selected ${this.attachmentFiles.length} attachment file(s) to include in every email.`, 'success');
+  }
+
+  renderAttachmentList() {
+    const list = document.getElementById('ammAttachmentList');
+    const clearBtn = document.getElementById('ammAttachmentClear');
+
+    if (!this.attachmentFiles || this.attachmentFiles.length === 0) {
+      list.textContent = 'No files selected';
+      list.classList.add('empty');
+      clearBtn.style.display = 'none';
+      return;
+    }
+
+    list.classList.remove('empty');
+    clearBtn.style.display = 'inline-flex';
+
+    const names = this.attachmentFiles.slice(0, 5).map(file => file.name);
+    const more = this.attachmentFiles.length > 5 ? ` (+${this.attachmentFiles.length - 5} more)` : '';
+    list.textContent = `${names.join(', ')}${more}`;
+  }
   
   log(message, type = 'info') {
     const consoleEl = document.getElementById('ammConsole');
@@ -648,6 +749,8 @@ class MailMergeController {
     document.getElementById('ammBatchSize').disabled = true;
     document.getElementById('ammBatchPause').disabled = true;
     document.getElementById('ammDropzone').style.pointerEvents = 'none';
+    document.getElementById('ammAttachmentPicker').disabled = true;
+    document.getElementById('ammAttachmentClear').disabled = true;
     
     this.log('Starting Mail Merge...', 'info');
     
@@ -687,6 +790,8 @@ class MailMergeController {
     document.getElementById('ammBatchSize').disabled = false;
     document.getElementById('ammBatchPause').disabled = false;
     document.getElementById('ammDropzone').style.pointerEvents = 'all';
+    document.getElementById('ammAttachmentPicker').disabled = false;
+    document.getElementById('ammAttachmentClear').disabled = false;
     
     if (wasActive && this.csvData && this.csvData.rows && this.csvData.rows.length > 0) {
       // Just stopped sending — keep the CSV loaded so user can restart
@@ -705,6 +810,10 @@ class MailMergeController {
       fileInfo.textContent = '';
       
       document.getElementById('ammVarsGuide').innerHTML = 'Variables detected: <i>None (upload CSV first)</i>';
+      
+      this.attachmentFiles = [];
+      document.getElementById('ammAttachmentInput').value = '';
+      this.renderAttachmentList();
       
       document.getElementById('ammActionBtn').setAttribute('disabled', 'true');
       document.getElementById('ammCancelBtn').textContent = 'Reset';
@@ -782,11 +891,9 @@ class MailMergeController {
       const personalizedSubject = personalizeTemplate(subjectTemplate, row);
       let personalizedBody = personalizeTemplate(bodyTemplate, row);
       
-      // Anti-spam fingerprinting ensures every email's content is unique
+      // Anti-spam fingerprinting disabled by default to avoid adding a footer to customer emails.
       if (useFingerprint) {
-        const randHash = Math.random().toString(36).substring(2, 10).toUpperCase();
-        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        personalizedBody += `<br><br><div style="font-size: 11px; color: #555555; border-top: 1px solid #dddddd; padding-top: 6px; margin-top: 12px; display: block; font-family: sans-serif;">Sent via FASTHub (Ref: ${randHash} | ${timestamp})</div>`;
+        // Kept for compatibility, but does not append any footer text.
       }
       
       this.log(`Sending to ${email} (${this.currentIndex + 1} of ${total})...`, 'info');
@@ -858,6 +965,9 @@ class MailMergeController {
     
     // 5. Fill "Body" text-editor
     await fillBodyField(composeDialog, body);
+
+    // 5b. Attach any queued files to every email
+    await attachFilesToCompose(composeDialog, this.attachmentFiles);
     
     // Human-like review delay (1s - 2s)
     const reviewDelay = 1000 + Math.random() * 1000;

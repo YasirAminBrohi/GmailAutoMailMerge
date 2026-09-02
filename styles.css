@@ -227,6 +227,37 @@
   min-height: 120px;
 }
 
+.amm-attachment-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.amm-attachment-picker,
+.amm-attachment-clear {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.amm-attachment-list {
+  min-height: 22px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 10px;
+  word-break: break-word;
+}
+
+.amm-attachment-list.empty {
+  color: var(--text-secondary);
+}
+
 /* Variables Badge Guide */
 .amm-vars-guide {
   font-size: 11px;
