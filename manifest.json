@@ -2,12 +2,13 @@
   "manifest_version": 3,
   "name": "Gmail AutoMail Merge",
   "version": "1.2",
-  "description": "Automate personalized mail merges directly within Gmail using CSV files with background tab execution.",
+  "description": "Automate personalized mail merges directly within Gmail using CSV files with background tab execution. Power By NorthPeak Studio.",
+  "author": "NorthPeak Studio",
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Gmail AutoMail Merge"
+    "default_title": "Gmail AutoMail Merge - Power By NorthPeak Studio"
   },
   "host_permissions": [
     "https://mail.google.com/*"
@@ -22,7 +23,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["worker.js"],
+      "resources": ["worker.js", "northpeak-logo.svg"],
       "matches": ["https://mail.google.com/*"]
     }
   ],

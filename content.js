@@ -411,11 +411,15 @@ class MailMergeController {
     document.body.appendChild(this.launcher);
     
     // 2. Create control panel modal
+    const logoUrl = chrome.runtime.getURL('northpeak-logo.svg');
     this.panel = document.createElement('div');
     this.panel.className = 'amm-panel';
     this.panel.innerHTML = `
       <div class="amm-header" id="ammHeader">
-        <h3 class="amm-header-title">Gmail AutoMail Merge</h3>
+        <div class="amm-header-titles">
+          <h3 class="amm-header-title">Gmail AutoMail Merge</h3>
+          <span class="amm-header-subtitle">Power By <img src="${logoUrl}" class="amm-header-np-logo" alt="NorthPeak Studio" /> <strong>NorthPeak Studio</strong></span>
+        </div>
         <button class="amm-header-close" id="ammClose">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
@@ -501,6 +505,10 @@ class MailMergeController {
         <div class="amm-btn-row">
           <button class="amm-btn amm-btn-primary" id="ammActionBtn" disabled>Start Mail Merge</button>
           <button class="amm-btn amm-btn-danger" id="ammCancelBtn" disabled>Reset</button>
+        </div>
+        <div class="amm-footer-powered">
+          <img src="${logoUrl}" class="amm-footer-logo" alt="NorthPeak Studio" />
+          <span>Power By <strong>NorthPeak Studio</strong></span>
         </div>
       </div>
     `;

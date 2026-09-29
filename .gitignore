@@ -1,0 +1,11 @@
+# Node dependencies
+node_modules/
+
+# Build artifacts
+dist/
+*.zip
+
+# OS artifacts
+Thumbs.db
+.DS_Store
+*.log

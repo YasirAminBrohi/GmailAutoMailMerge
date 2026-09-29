@@ -9,6 +9,11 @@
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 <p align="center">
+  <img src="northpeak-logo.svg" alt="NorthPeak Studio Logo" width="72" height="72" style="border-radius: 12px; margin-top: 10px;" /><br/>
+  <b>⚡ Power By NorthPeak Studio</b>
+</p>
+
+<p align="center">
   <b>A powerful, lightweight Chrome Extension (Manifest V3) that brings personalized mail merges, rich HTML templates, human telemetry simulation, and background multi-tasking directly into Gmail.</b>
 </p>
 
@@ -129,17 +134,31 @@ sequenceDiagram
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation & Development
 
-1. Clone or download this repository:
-   ```bash
-   git clone https://github.com/your-username/gmail-automail-merge.git
-   ```
+### Option 1: Load Directly into Chrome (Developer Mode)
+1. Clone or download this repository.
 2. Open **Google Chrome** and navigate to `chrome://extensions/`.
 3. Toggle **Developer mode** to the **ON** position (top-right switch).
 4. Click the **Load unpacked** button (top-left).
-5. Select the `automail` folder containing `manifest.json`.
+5. Select this project folder (`GmailAutoMailMerge` or `dist/extension`).
 6. Open [Gmail](https://mail.google.com/) — the extension is ready to use!
+
+### Option 2: Build & Package for Distribution
+To validate and build the production-ready distribution package:
+```bash
+# Build production bundle and zip archive
+npm run build
+# or: node build.js
+```
+This generates:
+- `dist/extension/` — Clean, ready-to-load unpacked extension directory.
+- `dist/gmail-automail-merge-v1.2.zip` — Compressed archive ready for Chrome Web Store submission or distribution.
+
+To run syntax tests:
+```bash
+npm test
+```
 
 ---
 
@@ -246,5 +265,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 <div align="center">
+  <img src="northpeak-logo.svg" alt="NorthPeak Studio" width="40" height="40" style="border-radius: 8px;" />
+  <p><b>Power By NorthPeak Studio</b></p>
   <sub>Built with modern Chrome Extension standards (Manifest V3) • Gmail AutoMail Merge</sub>
 </div>

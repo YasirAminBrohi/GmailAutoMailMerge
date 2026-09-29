@@ -1,0 +1,19 @@
+{
+  "name": "gmail-automail-merge",
+  "version": "1.2.0",
+  "description": "Automate personalized mail merges directly within Gmail using CSV files with background tab execution. Power By NorthPeak Studio.",
+  "author": "NorthPeak Studio",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "test": "node --check background.js && node --check worker.js && node --check content.js",
+    "clean": "node -e \"const fs=require('fs'); fs.rmSync('dist', { recursive: true, force: true }); console.log('Cleaned dist directory.');\""
+  },
+  "keywords": [
+    "gmail",
+    "mail-merge",
+    "chrome-extension",
+    "manifest-v3"
+  ],
+  "license": "MIT"
+}
